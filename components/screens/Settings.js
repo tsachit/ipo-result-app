@@ -7,49 +7,27 @@ import { SettingsContext } from '../context/SettingsContext';
 import UserForm from '../partials/UserForm';
 import UserList from '../partials/UserList';
 
-const Settings = ({ navigation }) => {
+const Settings = () => {
   const { settings: { users } } = useContext(SettingsContext);
-  const [addUser, setAddUser] = useState(false);
+  const [addUser, setAddUser] = useState(!users.length);
+  const [editUser, setEditUser] = useState(null);
 
-  // useEffect(() => {
-
-  // }, [addUser, users]);
+  const resetForm = () => {
+    setAddUser(false);
+    setEditUser(null);
+  };
 
   return (
     <View style={styles.container}>
-      {addUser ? <UserForm navigation={navigation} setAddUser={setAddUser} /> : <UserList />}
-      { !addUser && (
+      {(addUser || editUser) ? <UserForm editUser={editUser} resetForm={resetForm} /> : <UserList setEditUser={setEditUser} />}
+      { !(addUser || editUser) && (
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={() => setAddUser(true)}
           style={styles.touchableOpacityStyle}>
-            <FontAwesomeIcon icon={ faPlus } color="#fff" />
-          {/* <Image
-            // FAB using TouchableOpacity with an image
-            // For online image
-            source={{
-              uri:
-                'https://raw.githubusercontent.com/AboutReact/sampleresource/master/plus_icon.png',
-            }}
-            // For local image
-            //source={require('./images/float-add-icon.png')}
-            style={styles.floatingButtonStyle}
-          /> */}
+          <FontAwesomeIcon icon={ faPlus } color="#fff" />
         </TouchableOpacity>
       )}
-      
-      {/* <ScrollView style={styles.listArea}>
-        <Items
-          key={`forceupdate-todo-${forceUpdateId}`}
-          done={false}
-          onPressItem={(id) => console.log(db, id, forceUpdate)}
-        />
-        <Items
-          done
-          key={`forceupdate-done-${forceUpdateId}`}
-          onPressItem={(id) => console.log(db, id, forceUpdate)}
-        />
-      </ScrollView> */}
     </View>
   );
 }

@@ -1,14 +1,34 @@
 import React, { useContext } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, Alert } from "react-native";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faPencilAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 
-import { SettingsContext } from '../context/SettingsContext';
-const UserList = () => {
-  const { settings: { users } } = useContext(SettingsContext);
+import { deleteUserOnDB } from '../../lib/database';
 
-  const handleEdit = () => {
-    console.log('Edit');
+import { SettingsContext } from '../context/SettingsContext';
+const UserList = ({setEditUser}) => {
+  const { settings: { users }, setSettings } = useContext(SettingsContext);
+
+  const confirmDelete = (id) => {
+    // delete in db
+    Alert.alert(
+      'Delete Confirmation',
+      'Are you sure you want to delete it?',
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        { text: "OK", onPress: () => {
+          const updatedUsers = [ ...users ];
+          const userIndex = updatedUsers.findIndex(u => u.id === id);
+          delete updatedUsers[userIndex];
+          deleteUserOnDB(id);
+          setSettings({ users: updatedUsers });
+        } }
+      ]
+    );
   };
 
   const handleDelete = () => {
@@ -17,18 +37,18 @@ const UserList = () => {
 
   return (
     <View style={styles.sectionContainer}>
-      <Text style={styles.sectionHeading}>Accounts</Text>
-      {users.map(({ name, boid }) => (
-        <View style={styles.row} key={`${name}-${boid}`}>
+      <Text style={styles.heading}>Accounts</Text>
+      {users.map(({ id, name, boid }) => (
+        <View style={styles.row} key={id}>
           <View>
             <Text style={styles.detail}>Name: {name}</Text>
             <Text style={styles.detail}>BOID: {boid}</Text>
           </View>
           <View style={styles.actions}>
-            <TouchableOpacity onPress={handleEdit} style={styles.button}>
+            <TouchableOpacity onPress={() => setEditUser(id)} style={styles.button}>
               <Text><FontAwesomeIcon icon={ faPencilAlt } color='#2196f3' /></Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleDelete} style={styles.button}>
+            <TouchableOpacity onPress={() => confirmDelete(id)} style={styles.button}>
               <Text><FontAwesomeIcon icon={ faTrash } color='red' /></Text>
             </TouchableOpacity>
           </View>
@@ -43,10 +63,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginHorizontal: 16,
   },
-  sectionHeading: {
-    fontSize: 18,
+  heading: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginTop: 15,
     marginBottom: 24,
-    textAlign: 'center'
   },
   row: {
     flexDirection: "row",

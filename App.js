@@ -15,6 +15,8 @@ import { SettingsProvider } from './components/context/SettingsContext';
 import Home from './components/screens/Home';
 import Settings from './components/screens/Settings';
 
+import { createTable } from './lib/database';
+
 const Tab = createBottomTabNavigator();
 const defaultOptions = {
   headerStyle: {
@@ -26,6 +28,8 @@ const defaultOptions = {
   },
 };
 
+// create table
+createTable();
 const App = () => {
   return (
     <>

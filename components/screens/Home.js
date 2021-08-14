@@ -7,6 +7,8 @@ import { fetchCompanies, checkResult } from '../../lib/utils';
 
 import { checkValidation, isFormValid } from '../../lib/validation';
 
+import { fetchUsers } from '../../lib/database';
+
 const Home = ({ navigation }) => {
   const { settings: { users, companies }, setSettings } = useContext(SettingsContext);
   const [companyShareId, setCompanyShareId] = useState('');
@@ -22,13 +24,14 @@ const Home = ({ navigation }) => {
         setCompanyShareId(lastCompany.id);
       }
     });
+    fetchUsers((users) => {
+      setSettings({ users });
+      if(users.length){
+        alert(JSON.stringify(users));
+        setBOID(users[0].boid);
+      }
+    });
   }, []);
-
-  useEffect(() => {
-    if(users.length){
-      setBOID(users[0].boid);
-    }
-  }, [users]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -71,7 +74,7 @@ const Home = ({ navigation }) => {
         }}
       >
         {!users.length && <Picker.Item key='' label='None' value=''/>}
-        {users.map(user => (<Picker.Item key={user.boid} label={user.name} value={user.boid}/>))}
+        {users.map(user => (<Picker.Item key={user.id} label={user.name} value={user.boid}/>))}
       </Picker>
       {errors.boid && (
         <View style={styles.flexRow}>

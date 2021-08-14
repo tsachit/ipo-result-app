@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Button } from "react-native";
 
 import { userValidation, isFormValid, isFieldValid } from '../../lib/validation';
@@ -6,20 +6,38 @@ import { userValidation, isFormValid, isFieldValid } from '../../lib/validation'
 import { SettingsContext } from '../context/SettingsContext';
 import InputText from './InputText';
 
-const UserForm = ({ navigation, setAddUser }) => {
+import { createUserOnDB, updateUserOnDB } from '../../lib/database';
+
+const UserForm = ({ editUser, resetForm }) => {
   const { settings: { users }, setSettings } =  useContext(SettingsContext);
   const [name, setName] = useState('');
   const [boid, setBOID] = useState('');
   const [errors, setErrors] = useState({});
 
+  useEffect(() => {
+    if(editUser) {
+      const user = users.find(u => u.id === editUser);
+      setName(user.name);
+      setBOID(user.boid.toString());
+    }
+  }, [editUser]);
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const params = { name, boid };
     if (isFormValid(params, userValidation, errors, setErrors)) {
-      // create to db
-      console.log('saving to db ...');
-      setSettings({ users: [ ...users, { name, boid }]});
-      setAddUser(false);
+      if(editUser) {
+        const updatedUsers = [ ...users ];
+        const userIndex = updatedUsers.findIndex(u => u.id === editUser);
+        updatedUsers[userIndex] = { name, boid};
+        updateUserOnDB(editUser, name, boid)
+        setSettings({ users: updatedUsers });
+      } else {
+        createUserOnDB(name, boid);
+        // TODO: TEST THIS
+        setSettings({ users: [ ...users, { name, boid }]});
+      }
+      resetForm();
     }
   };
 
@@ -47,7 +65,7 @@ const UserForm = ({ navigation, setAddUser }) => {
         value={boid}
         error={errors.boid}/>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={() => setAddUser(false)} style={styles.cancelButton}>
+        <TouchableOpacity onPress={resetForm} style={styles.cancelButton}>
           <Text style={styles.cancel}>Cancel</Text>
         </TouchableOpacity>
         <Button

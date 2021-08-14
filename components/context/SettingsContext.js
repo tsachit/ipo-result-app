@@ -1,13 +1,10 @@
 import React, { createContext, useState } from 'react';
-import get from 'lodash/get';
 
 export const SettingsContext = createContext();
 
 const defaultSettings = {
-  users: [
-    {boid: 34234234, name: 'Sachit'},
-    {boid: 234234, name: 'Karki'}
-  ]
+  users: [],
+  companies: []
 };
 
 // This context provider is passed to any component requiring the context

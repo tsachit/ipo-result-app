@@ -30,15 +30,19 @@ const UserForm = ({ navigation, setAddUser }) => {
       <Text style={styles.heading}>Add Details</Text>
       <InputText
         key='name'
-        onChange={(event) => handleChange('name', event.target.value)}
-        onChangeText={(val) => setName(val)}
+        onChangeText={(val) => {
+          handleChange('name', val)
+          setName(val)
+        }}
         placeholder='Name'
         value={name}
         error={errors.name}/>
       <InputText
         key='boid'
-        onChange={(event) => handleChange('boid', event.target.value)}
-        onChangeText={(val) => setBOID(val)}
+        onChangeText={(val) => {
+          handleChange('boid', val)
+          setBOID(val)
+        }}
         placeholder='BOID'
         value={boid}
         error={errors.boid}/>

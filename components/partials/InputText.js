@@ -1,11 +1,13 @@
 import React from 'react';
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
-const InputText = ({ onChange, onChangeText, placeholder, fieldName, value, error }) => {
+const InputText = (props) => {
+  const { onChange, onChangeText, placeholder, value, error } = props;
   return (
     <>
       <View style={styles.flexRow}>
         <TextInput
+          {...props}
           onChange={onChange}
           onChangeText={onChangeText}
           placeholder={placeholder}

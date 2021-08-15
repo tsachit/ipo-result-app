@@ -44,7 +44,7 @@ const App = () => {
       ) : (
         <SettingsProvider>
           <NavigationContainer>
-            <Tab.Navigator 
+            <Tab.Navigator
               screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
                   let iconName = faHome;

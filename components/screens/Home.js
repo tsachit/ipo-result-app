@@ -14,20 +14,22 @@ const Home = ({ navigation }) => {
   const [companyShareId, setCompanyShareId] = useState('');
   const [boid, setBOID] = useState('');
   const [message, setMessage] = useState('');
+  const [loadingCompanies, setLoadingCompanies] = useState('Loading...');
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchCompanies((companies) => {
-      setSettings({ companies });
       if(companies.length){
+        setSettings({ companies });
         const lastCompany = companies[companies.length - 1];
         setCompanyShareId(lastCompany.id);
+      } else {
+        setLoadingCompanies('No companies found, server busy. Try again later');
       }
     });
     fetchUsers((users) => {
       setSettings({ users });
       if(users.length){
-        alert(JSON.stringify(users));
         setBOID(users[0].boid);
       }
     });
@@ -42,22 +44,25 @@ const Home = ({ navigation }) => {
         setMessage(msg);
       });
     } else {
+      setMessage('Noting...')
     }
   };
 
   return (
     <View style={styles.container}>
-      <Picker
-        onChange={() => {if (message !== '') setMessage('')}}
-        selectedValue={companyShareId}
-        style={styles.picker}
-        onValueChange={(itemValue) => {
-          setCompanyShareId(itemValue)
-          if (message !== '') setMessage('')
-        }}
-      >
-        {companies.map(company => (<Picker.Item key={company.id} label={company.name} value={company.id}/>))}
-      </Picker>
+      {companies.length ? (
+        <Picker
+          onChange={() => {if (message !== '') setMessage('')}}
+          selectedValue={companyShareId}
+          style={styles.picker}
+          onValueChange={(itemValue) => {
+            setCompanyShareId(itemValue)
+            if (message !== '') setMessage('')
+          }}
+        >
+          {companies.map(company => (<Picker.Item key={company.id} label={company.name} value={company.id}/>))}
+        </Picker>
+      ) : (<Text>{loadingCompanies}</Text>)}
       {errors.companyShareId && (
         <View style={styles.flexRow}>
           <Text style={styles.error}>
@@ -65,17 +70,26 @@ const Home = ({ navigation }) => {
           </Text>
         </View>
       )}
-      <Picker
-        selectedValue={boid}
-        style={styles.picker}
-        onValueChange={(itemValue) => {
-          setBOID(itemValue)
-          if (message !== '') setMessage('')
-        }}
-      >
-        {!users.length && <Picker.Item key='' label='None' value=''/>}
-        {users.map(user => (<Picker.Item key={user.id} label={user.name} value={user.boid}/>))}
-      </Picker>
+      {users.length ? (
+        <Picker
+          selectedValue={boid}
+          style={styles.picker}
+          onValueChange={(itemValue) => {
+            setBOID(itemValue)
+            if (message !== '') setMessage('')
+          }}
+        >
+          {users.map(user => (<Picker.Item key={user.id} label={user.name} value={user.boid}/>))}
+        </Picker>
+      ) : (<Text>No users found, create users from <Text style={styles.link} onPress={() => navigation.navigate('Settings')}>here</Text></Text>)}
+      {errors.companyShareId && (
+        <View style={styles.flexRow}>
+          <Text style={styles.error}>
+            {errors.companyShareId}
+          </Text>
+        </View>
+      )}
+      
       {errors.boid && (
         <View style={styles.flexRow}>
           <Text style={styles.error}>
@@ -121,6 +135,9 @@ const styles = StyleSheet.create({
   },
   error: {
     color: 'red',
+  },
+  link: {
+    textDecorationLine: 'underline',
   }
 });
 

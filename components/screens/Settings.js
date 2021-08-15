@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { TouchableOpacity, StyleSheet, View } from "react-native";
+import { TouchableOpacity, StyleSheet, View, Text } from "react-native";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
@@ -9,7 +9,8 @@ import UserList from '../partials/UserList';
 
 const Settings = () => {
   const { settings: { users } } = useContext(SettingsContext);
-  const [addUser, setAddUser] = useState(!users.length);
+  // take to user add form if there isn't any users
+  const [addUser, setAddUser] = useState(users.length > 0);
   const [editUser, setEditUser] = useState(null);
 
   const resetForm = () => {
@@ -17,16 +18,20 @@ const Settings = () => {
     setEditUser(null);
   };
 
+  const showForm = addUser || Boolean(editUser);
+
   return (
     <View style={styles.container}>
-      {(addUser || editUser) ? <UserForm editUser={editUser} resetForm={resetForm} /> : <UserList setEditUser={setEditUser} />}
-      { !(addUser || editUser) && (
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => setAddUser(true)}
-          style={styles.touchableOpacityStyle}>
-          <FontAwesomeIcon icon={ faPlus } color="#fff" />
-        </TouchableOpacity>
+      {showForm ? (<UserForm editUser={editUser} resetForm={resetForm} />) : (
+        <>
+          <UserList setEditUser={setEditUser} />
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => setAddUser(true)}
+            style={styles.touchableOpacityStyle}>
+            <FontAwesomeIcon icon={ faPlus } color="#fff" />
+          </TouchableOpacity>
+        </>
       )}
     </View>
   );

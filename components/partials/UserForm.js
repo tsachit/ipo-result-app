@@ -29,19 +29,38 @@ const UserForm = ({ editUser, resetForm }) => {
       if(editUser) {
         const updatedUsers = [ ...users ];
         const userIndex = updatedUsers.findIndex(u => u.id === editUser);
-        updatedUsers[userIndex] = { name, boid};
-        updateUserOnDB(editUser, name, boid)
-        setSettings({ users: updatedUsers });
+        updatedUsers[userIndex] = { id: editUser, name, boid};
+        updateUserOnDB(
+          editUser, name, boid,
+          () => {
+            setSettings({ users: updatedUsers });
+            resetForm();
+          },
+          (error) => setErrors({ message: error})
+        );
       } else {
-        createUserOnDB(name, boid);
-        // TODO: TEST THIS
-        setSettings({ users: [ ...users, { name, boid }]});
+        createUserOnDB(
+          name, boid,
+          (id) => {
+            setSettings({ users: [ ...users, { id, name, boid }] });
+            resetForm();
+          },
+          (error) => setErrors({ message: error})
+        );
       }
-      resetForm();
     }
   };
 
-  const handleChange = (field, value) => isFieldValid(field, value, userValidation, errors, setErrors);
+  const handleChange = (field, value) => {
+    isFieldValid(field, value, userValidation, errors, setErrors);
+    if(errors.message){
+      setErrors(oldErrors => {
+        const newErrors = {...oldErrors};
+        delete newErrors.message;
+        return newErrors;
+      });
+    }
+  };
 
   return (
     <View>
@@ -63,7 +82,15 @@ const UserForm = ({ editUser, resetForm }) => {
         }}
         placeholder='BOID'
         value={boid}
-        error={errors.boid}/>
+        error={errors.boid}
+        maxLength={16}/>
+      {errors.message && (
+        <View style={styles.errorRow}>
+          <Text style={styles.error}>
+            {errors.message}
+          </Text>
+        </View>
+      )}
       <View style={styles.buttonContainer}>
         <TouchableOpacity onPress={resetForm} style={styles.cancelButton}>
           <Text style={styles.cancel}>Cancel</Text>
@@ -85,22 +112,6 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginBottom: 15,
   },
-  flexRow: {
-    flexDirection: "row",
-  },
-  input: {
-    borderColor: "#4630eb",
-    borderRadius: 4,
-    borderWidth: 1,
-    height: 48,
-    marginTop: 16,
-    marginBottom: 8,
-    padding: 8,
-    flex: 1,
-  },
-  inputError: {
-    borderColor: "red",
-  },
   buttonContainer: {
     width: '100%',
     height: '30%',
@@ -116,7 +127,15 @@ const styles = StyleSheet.create({
   cancel: {
     backgroundColor: "#e0e0e0",
   },
+  errorRow: {
+    width: '100%',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    flexDirection: "row",
+  },
   error: {
+    margin: 'auto',
+    alignItems: 'center',
     color: 'red',
   }
 });

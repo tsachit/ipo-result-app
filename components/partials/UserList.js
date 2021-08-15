@@ -23,17 +23,19 @@ const UserList = ({setEditUser}) => {
         { text: "OK", onPress: () => {
           const updatedUsers = [ ...users ];
           const userIndex = updatedUsers.findIndex(u => u.id === id);
-          delete updatedUsers[userIndex];
-          deleteUserOnDB(id);
-          setSettings({ users: updatedUsers });
+
+          updatedUsers.splice(userIndex, 1);
+          deleteUserOnDB(id,
+            () => {
+              setSettings({ users: updatedUsers });
+            },
+            (error) => setErrors({ message: error})
+          );
         } }
       ]
     );
   };
 
-  const handleDelete = () => {
-    console.log('Delete');
-  };
 
   return (
     <View style={styles.sectionContainer}>
@@ -41,7 +43,7 @@ const UserList = ({setEditUser}) => {
       {users.map(({ id, name, boid }) => (
         <View style={styles.row} key={id}>
           <View>
-            <Text style={styles.detail}>Name: {name}</Text>
+            <Text style={styles.detail}>Name: {name}, {id}</Text>
             <Text style={styles.detail}>BOID: {boid}</Text>
           </View>
           <View style={styles.actions}>

@@ -1,0 +1,15 @@
+{
+  "name": "sachit-app",
+  "displayName": "check-ipo-result",
+  "expo": {
+    "name": "check-ipo-result",
+    "slug": "check-ipo-result",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "package": "com.tshawchit.checkiporesult"
+    }
+  }
+}

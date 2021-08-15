@@ -23,20 +23,7 @@ const Results = ({ data }) => {
 const Home = ({ navigation }) => {
   const { settings: { users, companies }, setSettings } = useContext(SettingsContext);
   const [companyShareId, setCompanyShareId] = useState('');
-  const [result, setResult] = useState([
-    {
-      "boid": 1235577899876322,
-      "id": 1,
-      "message": "Invalid BOID number, result not found",
-      "name": "Tt",
-    },
-    {
-      "boid": 1301060001422315,
-      "id": 3,
-      "message": "Sorry, not alloted for the entered BOID. ",
-      "name": "Sachit",
-    },
-  ]);
+  const [result, setResult] = useState('');
   const [loadingCompanies, setLoadingCompanies] = useState('Loading...');
   const [errors, setErrors] = useState({});
 

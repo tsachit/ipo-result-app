@@ -43,7 +43,7 @@ const UserList = ({setEditUser}) => {
       {users.map(({ id, name, boid }) => (
         <View style={styles.row} key={id}>
           <View>
-            <Text style={styles.detail}>Name: {name}, {id}</Text>
+            <Text style={styles.detail}>Name: {name}</Text>
             <Text style={styles.detail}>BOID: {boid}</Text>
           </View>
           <View style={styles.actions}>

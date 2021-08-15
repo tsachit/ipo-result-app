@@ -5,15 +5,38 @@ import { Picker } from '@react-native-picker/picker';
 import { SettingsContext } from '../context/SettingsContext';
 import { fetchCompanies, checkResult } from '../../lib/utils';
 
-import { checkValidation, isFormValid } from '../../lib/validation';
-
 import { fetchUsers } from '../../lib/database';
+
+const Results = ({ data }) => {
+  return (
+    <>
+      { data.map(datum => (
+        <View style={styles.resultRow}>
+          <Text style={styles.resultText}>{datum.name}: {datum.boid}</Text>
+          <Text style={styles.resultText}>{datum.message}</Text>
+        </View>
+      )) }
+    </>
+  );
+}
 
 const Home = ({ navigation }) => {
   const { settings: { users, companies }, setSettings } = useContext(SettingsContext);
   const [companyShareId, setCompanyShareId] = useState('');
-  const [boid, setBOID] = useState('');
-  const [message, setMessage] = useState('');
+  const [result, setResult] = useState([
+    {
+      "boid": 1235577899876322,
+      "id": 1,
+      "message": "Invalid BOID number, result not found",
+      "name": "Tt",
+    },
+    {
+      "boid": 1301060001422315,
+      "id": 3,
+      "message": "Sorry, not alloted for the entered BOID. ",
+      "name": "Sachit",
+    },
+  ]);
   const [loadingCompanies, setLoadingCompanies] = useState('Loading...');
   const [errors, setErrors] = useState({});
 
@@ -29,35 +52,25 @@ const Home = ({ navigation }) => {
     });
     fetchUsers((users) => {
       setSettings({ users });
-      if(users.length){
-        setBOID(users[0].boid);
-      }
     });
   }, []);
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const params = { companyShareId, boid };
-    if (isFormValid(params, checkValidation, errors, setErrors)) {
-      setMessage('Checking...')
-      checkResult(JSON.stringify({companyShareId, boid}), (msg) => {
-        setMessage(msg);
-      });
-    } else {
-      setMessage('Noting...')
-    }
+    setResult('Checking...');
+    checkResult(companyShareId, users, setResult);
   };
 
   return (
     <View style={styles.container}>
       {companies.length ? (
         <Picker
-          onChange={() => {if (message !== '') setMessage('')}}
+          onChange={() => {if (result !== '') setResult('')}}
           selectedValue={companyShareId}
           style={styles.picker}
           onValueChange={(itemValue) => {
             setCompanyShareId(itemValue)
-            if (message !== '') setMessage('')
+            if (result !== '') setResult('')
           }}
         >
           {companies.map(company => (<Picker.Item key={company.id} label={company.name} value={company.id}/>))}
@@ -71,43 +84,20 @@ const Home = ({ navigation }) => {
         </View>
       )}
       {users.length ? (
-        <Picker
-          selectedValue={boid}
-          style={styles.picker}
-          onValueChange={(itemValue) => {
-            setBOID(itemValue)
-            if (message !== '') setMessage('')
-          }}
-        >
-          {users.map(user => (<Picker.Item key={user.id} label={user.name} value={user.boid}/>))}
-        </Picker>
-      ) : (<Text>No users found, create users from <Text style={styles.link} onPress={() => navigation.navigate('Settings')}>here</Text></Text>)}
-      {errors.companyShareId && (
-        <View style={styles.flexRow}>
-          <Text style={styles.error}>
-            {errors.companyShareId}
-          </Text>
+        <View style={styles.submit}>
+          <Button
+            onPress={handleSubmit}
+            title="Check the result"
+          />
         </View>
+      ) : (
+        <Text style={styles.not_found}>
+          No accounts found, create users from <Text style={styles.link} onPress={() => navigation.navigate('Settings')}>here</Text>
+        </Text>
       )}
-      
-      {errors.boid && (
-        <View style={styles.flexRow}>
-          <Text style={styles.error}>
-            {errors.boid}
-          </Text>
-        </View>
-      )}
-      <View style={styles.submit}>
-        <Button
-          onPress={handleSubmit}
-          title="Check the result"
-        />
+      <View style={styles.resultContainer}>
+        {typeof result === 'object' ? <Results data={result}/> : <Text>{result}</Text>}
       </View>
-      { message !== '' && (
-        <View style={styles.result}>
-          <Text>{message}</Text>
-        </View>
-      )}
     </View>
   );
 }
@@ -127,8 +117,14 @@ const styles = StyleSheet.create({
   submit: {
     margin: 20
   },
-  result: {
-    marginTop: 50
+  resultContainer: {
+    marginTop: 100,
+  },
+  resultRow: {
+    marginBottom: 30,
+  },
+  resultText: {
+    fontSize: 18,
   },
   flexRow: {
     flexDirection: "row",
@@ -136,9 +132,12 @@ const styles = StyleSheet.create({
   error: {
     color: 'red',
   },
+  not_found: {
+    fontSize: 18,
+  },
   link: {
     textDecorationLine: 'underline',
-  }
+  },
 });
 
 export default Home;

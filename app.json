@@ -1,6 +1,6 @@
 {
   "name": "IPO Result",
-  "icon": "./img/logo.png",
+  "icon": "https://raw.githubusercontent.com/tsachit/public/main/ipo-result-logo.png",
   "displayName": "IPO Result",
   "expo": {
     "name": "IPO Result",

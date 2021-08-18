@@ -1,8 +1,9 @@
 {
-  "name": "ipo-result",
+  "name": "IPO Result",
+  "icon": "./img/logo.png",
   "displayName": "IPO Result",
   "expo": {
-    "name": "ipo-result",
+    "name": "IPO Result",
     "slug": "ipo-result",
     "version": "1.0.0",
     "assetBundlePatterns": [

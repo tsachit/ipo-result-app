@@ -10,7 +10,7 @@ import UserList from '../partials/UserList';
 const Settings = () => {
   const { settings: { users } } = useContext(SettingsContext);
   // take to user add form if there isn't any users
-  const [addUser, setAddUser] = useState(users.length > 0);
+  const [addUser, setAddUser] = useState(users.length <= 0);
   const [editUser, setEditUser] = useState(null);
 
   const resetForm = () => {

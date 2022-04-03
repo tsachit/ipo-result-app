@@ -11,7 +11,7 @@ const Results = ({ data }) => {
   return (
     <>
       { data.map(datum => (
-        <View style={styles.resultRow}>
+        <View key={datum?.id} style={styles.resultRow}>
           <Text style={styles.resultText}>{datum.name}: {datum.boid}</Text>
           <Text style={styles.resultText}>{datum.message}</Text>
         </View>
@@ -28,10 +28,11 @@ const Home = ({ navigation }) => {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    fetchCompanies((companies) => {
-      if(companies.length){
-        setSettings({ companies });
-        const lastCompany = companies[companies.length - 1];
+    fetchCompanies((response) => {
+      const { companyShareList } = response;
+      if(companyShareList && companyShareList.length){
+        setSettings({ companies: companyShareList });
+        const lastCompany = companyShareList[companyShareList.length - 1];
         setCompanyShareId(lastCompany.id);
       } else {
         setLoadingCompanies('No companies found, server busy. Try again later');
